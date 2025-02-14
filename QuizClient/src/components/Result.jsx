@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import useStateContext from "../hooks/useStateContext";
 import { ENDPOINTS, createAPIEndpoint } from "../api";
 import {
@@ -20,6 +20,7 @@ export default function Result() {
   const [score, setScore] = useState(0);
   const [qnAnswers, setQnAnswers] = useState([]);
   const [showAlert, setShowAlert] = useState(false);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,7 +37,10 @@ export default function Result() {
         setQnAnswers(qna);
         calculateScore(qna);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log("Failed to Fetch Answers", err);
+        setError(new Error("Failed to Fetch Answers"));
+      });
   }, []);
 
   const calculateScore = (qna) => {
@@ -70,9 +74,19 @@ export default function Result() {
         }, 4000);
       })
       .catch((err) => {
-        console.log(err);
+        console.error("Failed to Submit the Score", err);
+        setError(new Error("Failed to Submit the Score"));
       });
   };
+
+  if (error) {
+    throw error;
+  }
+
+  const formattedTime = useMemo(
+    () => getFormatedTime(context.timeTaken),
+    [context.timeTaken]
+  );
 
   return (
     <>
@@ -93,11 +107,9 @@ export default function Result() {
               <Typography variant="span" color={green[500]}>
                 {score}
               </Typography>
-              /5
+              /{qnAnswers.length}
             </Typography>
-            <Typography variant="h6">
-              Took {getFormatedTime(context.timeTaken) + " mins"}
-            </Typography>
+            <Typography variant="h6">Took {formattedTime + " mins"}</Typography>
             <Button
               variant="contained"
               sx={{ mx: 1 }}

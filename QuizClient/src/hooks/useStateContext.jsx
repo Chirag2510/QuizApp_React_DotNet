@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-export const stateContext = createContext();
+export const stateContext = createContext({
+  context: {},
+  setContext: () => {},
+});
 
 const getFreshContext = () => {
   if (localStorage.getItem("context") === null) {

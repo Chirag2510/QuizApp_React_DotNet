@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Card,
@@ -21,6 +21,7 @@ const getFreshModel = () => ({
 export default function Login() {
   const { context, setContext, resetContext } = useStateContext();
   const navigate = useNavigate();
+  const [error, setError] = useState(null);
 
   const { values, setValues, errors, setErrors, handleInputChange } =
     useForm(getFreshModel);
@@ -38,7 +39,10 @@ export default function Login() {
           setContext({ participantId: res.data.participantId });
           navigate("/quiz");
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          console.error("Failed to Login", err);
+          setError(new Error("Failed to Login"));
+        });
     }
   };
 
@@ -49,6 +53,10 @@ export default function Login() {
     setErrors(temp);
     return Object.values(temp).every((x) => x === "");
   };
+
+  if (error) {
+    throw error; // Throw the error to be caught by ErrorBoundary
+  }
 
   return (
     <Center>

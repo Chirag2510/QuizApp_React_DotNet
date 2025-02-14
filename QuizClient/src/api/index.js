@@ -1,14 +1,14 @@
-import axios from "axios";
+const axios = require("axios");
 
-export const BASE_URL = "http://localhost:5220/";
+const BASE_URL = "http://localhost:5220/";
 
-export const ENDPOINTS = {
+const ENDPOINTS = {
   participant: "Participants",
   question: "Questions",
   answer: "Questions/GetAnswers",
 };
 
-export const createAPIEndpoint = (endpoint) => {
+const createAPIEndpoint = (endpoint) => {
   let url = BASE_URL + "api/" + endpoint + "/";
 
   return {
@@ -18,4 +18,10 @@ export const createAPIEndpoint = (endpoint) => {
     put: (id, updatedRecord) => axios.put(url + id, updatedRecord),
     delete: (id) => axios.delete(url + id),
   };
+};
+
+module.exports = {
+  BASE_URL,
+  ENDPOINTS,
+  createAPIEndpoint,
 };

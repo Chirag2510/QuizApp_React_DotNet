@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import useStateContext from "../hooks/useStateContext";
 import { BASE_URL, ENDPOINTS, createAPIEndpoint } from "../api";
 import {
@@ -20,11 +20,14 @@ export default function Quiz() {
   const [qnIndex, setQnIndex] = useState(0);
   const [timeTaken, setTimeTaken] = useState(0);
   const { context, setContext } = useStateContext();
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   let timer;
 
   const startTimer = () => {
+    if (timer) clearInterval(timer);
+
     timer = setInterval(() => {
       setTimeTaken((prev) => prev + 1);
     }, [1000]);
@@ -43,7 +46,8 @@ export default function Quiz() {
         startTimer();
       })
       .catch((err) => {
-        console.log(err);
+        console.error("Failed to Fetch Questions", err);
+        setError(new Error("Failed to Fetch Questions"));
       });
 
     return () => {
@@ -58,7 +62,7 @@ export default function Quiz() {
       selected: optionIdx,
     });
 
-    if (qnIndex < 4) {
+    if (qnIndex < qns.length - 1) {
       setContext({ selectedOptions: [...temp] });
       setQnIndex(qnIndex + 1);
     } else {
@@ -67,7 +71,15 @@ export default function Quiz() {
     }
   };
 
-  return qns.length != 0 ? (
+  if (error) {
+    throw error;
+  }
+
+  const currentQuestionOptions = useMemo(() => {
+    return qns.length ? qns[qnIndex].options : [];
+  }, [qns, qnIndex]);
+
+  return qns.length !== 0 ? (
     <Card
       sx={{
         maxWidth: 640,
@@ -83,7 +95,7 @@ export default function Quiz() {
       <Box>
         <LinearProgress
           variant="determinate"
-          value={((qnIndex + 1) * 100) / 5}
+          value={((qnIndex + 1) * 100) / qns.length}
         />
       </Box>
       {qns[qnIndex].imageName !== null ? (
@@ -96,7 +108,7 @@ export default function Quiz() {
       <CardContent>
         <Typography variant="h6">{qns[qnIndex].qnInWords}</Typography>
         <List>
-          {qns[qnIndex].options.map((item, idx) => (
+          {currentQuestionOptions.map((item, idx) => (
             <ListItemButton
               disableRipple
               key={idx}
