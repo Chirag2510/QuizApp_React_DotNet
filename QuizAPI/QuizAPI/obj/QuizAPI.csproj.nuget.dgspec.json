@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "E:\\Chirag\\Project\\DotNet_React\\QuizApp_DotNet_React\\Backend\\QuizAPI\\QuizAPI.csproj": {}
+    "E:\\Chirag\\Project\\DotNet_React\\QuizApp_DotNet_React\\QuizAPI\\QuizAPI\\QuizAPI.csproj": {}
   },
   "projects": {
-    "E:\\Chirag\\Project\\DotNet_React\\QuizApp_DotNet_React\\Backend\\QuizAPI\\QuizAPI.csproj": {
+    "E:\\Chirag\\Project\\DotNet_React\\QuizApp_DotNet_React\\QuizAPI\\QuizAPI\\QuizAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\Chirag\\Project\\DotNet_React\\QuizApp_DotNet_React\\Backend\\QuizAPI\\QuizAPI.csproj",
+        "projectUniqueName": "E:\\Chirag\\Project\\DotNet_React\\QuizApp_DotNet_React\\QuizAPI\\QuizAPI\\QuizAPI.csproj",
         "projectName": "QuizAPI",
-        "projectPath": "E:\\Chirag\\Project\\DotNet_React\\QuizApp_DotNet_React\\Backend\\QuizAPI\\QuizAPI.csproj",
+        "projectPath": "E:\\Chirag\\Project\\DotNet_React\\QuizApp_DotNet_React\\QuizAPI\\QuizAPI\\QuizAPI.csproj",
         "packagesPath": "C:\\Users\\Chirag\\.nuget\\packages\\",
-        "outputPath": "E:\\Chirag\\Project\\DotNet_React\\QuizApp_DotNet_React\\Backend\\QuizAPI\\obj\\",
+        "outputPath": "E:\\Chirag\\Project\\DotNet_React\\QuizApp_DotNet_React\\QuizAPI\\QuizAPI\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
