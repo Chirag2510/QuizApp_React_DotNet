@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace QuizAPI.Models
@@ -14,18 +15,31 @@ namespace QuizAPI.Models
         [Column(TypeName = "nvarchar(50)")]
         public string Name { get; set; }
 
-        public int Score { get; set; }
+         [Column(TypeName = "nvarchar(500)")]
+        public string Password { get; set; }
 
-        public int TimeTaken { get; set; }
+        [Column(TypeName = "nvarchar(500)")]
+        public string? Score { get; set; }
+
+        [Column(TypeName = "nvarchar(500)")]
+        public string? TimeTaken { get; set; }
     }
 
     public class ParticipantResult
     {
         public int ParticipantId { get; set; }
 
-        public int Score { get; set; }
+        public string Score { get; set; }
 
-        public int TimeTaken { get; set; }
+        public string TimeTaken { get; set; }
+    }
+
+    public class ParticipantLogin 
+    {
+        public string Email { get; set; }
+
+        public string Password { get; set; }
+
     }
 
 }

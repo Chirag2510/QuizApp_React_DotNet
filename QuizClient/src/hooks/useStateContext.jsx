@@ -13,6 +13,7 @@ const getFreshContext = () => {
         participantId: 0,
         timeTaken: 0,
         selectedOptions: [],
+        authToken: "",
       })
     );
   }

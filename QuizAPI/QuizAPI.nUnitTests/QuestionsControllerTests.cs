@@ -27,8 +27,8 @@ namespace QuizAPI.Tests
 
             _context.Questions.AddRange(new List<Question>
             {
-                new Question { QnId = 1, QnInWords = "What is 2+2?", ImageName = "", Option1 = "3", Option2 = "4", Option3 = "5", Option4 = "6", Answer = 1},
-                new Question { QnId = 2, QnInWords = "What is 3+5?", ImageName = "", Option1 = "7", Option2 = "8", Option3 = "9", Option4 = "10", Answer = 1 }
+                new Question { QnId = 1, QnInWords = "What is 2+2?", ImageName = "", Option1 = "3", Option2 = "4", Option3 = "5", Option4 = "6", Answer = 2},
+                new Question { QnId = 2, QnInWords = "What is 3+5?", ImageName = "", Option1 = "7", Option2 = "8", Option3 = "9", Option4 = "10", Answer = 2 },
             });
             _context.SaveChanges();
         }
@@ -41,19 +41,20 @@ namespace QuizAPI.Tests
         }
 
         [Test, Order(1)]
-        public async Task GetQuestions_ReturnsRandomFiveQuestions()
+        public async Task GetQuestions()
         {
             var result = await _controller.GetQuestions();
             Assert.That(result, Is.InstanceOf<ActionResult<IEnumerable<Question>>>());
             Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
         }
 
+
         [Test, Order(2)]
         public async Task GetQuestion_ReturnsCorrectQuestion()
         {
             var result = await _controller.GetQuestion(1);
             Assert.That(result, Is.InstanceOf<ActionResult<Question>>());
-            Assert.That(result.Value.QnInWords, Is.EqualTo("What is 2+2?"));
+            Assert.That(result.Value?.QnInWords, Is.EqualTo("What is 2+2?"));
         }
 
         [Test, Order(3)]
