@@ -1,16 +1,30 @@
-import React from "react";
+import React, { useState } from "react";
 import { AppBar, Toolbar, Typography, Container, Button } from "@mui/material";
 import { Outlet, useNavigate } from "react-router-dom";
 import useStateContext from "../hooks/useStateContext";
+import { createAPIEndpoint, ENDPOINTS } from "../api";
 
 export default function Layout() {
   const { resetContext } = useStateContext();
   const navigate = useNavigate();
+  const [error, setError] = useState(null);
 
   const logout = () => {
-    resetContext();
-    navigate("/");
+    createAPIEndpoint(ENDPOINTS.logout)
+      .post()
+      .then(() => {
+        resetContext();
+        navigate("/");
+      })
+      .catch((err) => {
+        console.error("Failed to Logout", err);
+        setError(new Error("Failed to Logout"));
+      });
   };
+
+  if (error) {
+    setError(null);
+  }
 
   return (
     <>

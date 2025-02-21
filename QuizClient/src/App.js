@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Quiz from "./components/Quiz";
 import Result from "./components/Result";
 import Layout from "./components/Layout";
+import Signup from "./components/Signup";
 import Authenticate from "./components/Authenticate";
 import ErrorBoundary from "./components/ErrorBoundary";
 
@@ -13,6 +14,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
           <Route element={<Authenticate />}>
             <Route path="/" element={<Layout />}>
               <Route path="/quiz" element={<Quiz />}></Route>

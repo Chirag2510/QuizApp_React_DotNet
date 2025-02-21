@@ -1,41 +1,38 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Card,
   CardContent,
   TextField,
   Typography,
-  Link,
   Alert,
+  Link,
 } from "@mui/material";
 import { Box } from "@mui/system";
 import Center from "./Center";
 import useForm from "../hooks/useForm";
 import { ENDPOINTS, createAPIEndpoint } from "../api";
-import useStateContext from "../hooks/useStateContext";
 import { useNavigate } from "react-router-dom";
+import useStateContext from "../hooks/useStateContext";
 
 const getFreshModel = () => ({
+  name: "",
   email: "",
   password: "",
 });
 
-export default function Login() {
-  const { context, setContext, resetContext } = useStateContext();
+export default function Signup() {
   const navigate = useNavigate();
+  const { setContext } = useStateContext();
   const [error, setError] = useState(null);
 
   const { values, setValues, errors, setErrors, handleInputChange } =
     useForm(getFreshModel);
 
-  useEffect(() => {
-    resetContext();
-  }, []);
-
-  const login = (e) => {
+  const signup = (e) => {
     e.preventDefault();
     if (validate()) {
-      createAPIEndpoint(ENDPOINTS.login)
+      createAPIEndpoint(ENDPOINTS.signup)
         .post(values)
         .then((res) => {
           setContext({
@@ -45,11 +42,11 @@ export default function Login() {
           navigate("/quiz");
         })
         .catch((err) => {
-          if (err.response && err.response.status === 401) {
+          if (err.response && err.response.status === 409) {
             setError(new Error(err.response.data.message));
           } else {
-            console.error("Failed to Login", err);
-            setError(new Error("Failed to Login"));
+            console.error("Failed to Signup", err);
+            setError(new Error("Failed to Signup"));
           }
         });
     }
@@ -58,7 +55,11 @@ export default function Login() {
   const validate = () => {
     let temp = {};
     temp.email = /\S+@\S+\.\S+/.test(values.email) ? "" : "Email is not valid.";
-    temp.password = values.password !== "" ? "" : "This field is required.";
+    temp.name = values.name !== "" ? "" : "This field is required.";
+    temp.password =
+      values.password.length > 6
+        ? ""
+        : "Password must be at least 7 characters long.";
     setErrors(temp);
     return Object.values(temp).every((x) => x === "");
   };
@@ -92,7 +93,7 @@ export default function Login() {
               },
             }}
           >
-            <form noValidate autoComplete="on" onSubmit={login}>
+            <form noValidate autoComplete="on" onSubmit={signup}>
               <TextField
                 label="Email"
                 name="email"
@@ -100,6 +101,14 @@ export default function Login() {
                 onChange={handleInputChange}
                 variant="outlined"
                 {...(errors.email && { error: true, helperText: errors.email })}
+              />
+              <TextField
+                label="Name"
+                name="name"
+                value={values.name}
+                onChange={handleInputChange}
+                variant="outlined"
+                {...(errors.name && { error: true, helperText: errors.name })}
               />
               <TextField
                 label="Password"
@@ -119,13 +128,13 @@ export default function Login() {
                 size="large"
                 sx={{ width: "90%" }}
               >
-                Login
+                Signup
               </Button>
             </form>
             <Typography variant="body2" sx={{ mt: 2 }}>
-              Don't have an account?{" "}
-              <Link href="/signup" variant="body2">
-                Sign up
+              Already have an account?{" "}
+              <Link href="/" variant="body2">
+                Sign in
               </Link>
             </Typography>
           </Box>

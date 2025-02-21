@@ -56,7 +56,6 @@ export default function Result() {
       timeTaken: 0,
       selectedOptions: [],
     });
-
     navigate("/quiz");
   };
 
@@ -64,8 +63,8 @@ export default function Result() {
     createAPIEndpoint(ENDPOINTS.participant)
       .put(context.participantId, {
         participantId: context.participantId,
-        score: score,
-        timeTaken: context.timeTaken,
+        score: score.toString(),
+        timeTaken: context.timeTaken.toString(),
       })
       .then((res) => {
         setShowAlert(true);
