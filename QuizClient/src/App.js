@@ -7,6 +7,7 @@ import Layout from "./components/Layout";
 import Signup from "./components/Signup";
 import Authenticate from "./components/Authenticate";
 import ErrorBoundary from "./components/ErrorBoundary";
+import NotFound from "./components/NotFound";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
               <Route path="/result" element={<Result />}></Route>
             </Route>
           </Route>
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
     </ErrorBoundary>

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using QuizAPI.Models;
+using QuizAPI.Exceptions;
 
 namespace QuizAPI.Controllers
 {
@@ -48,7 +49,7 @@ namespace QuizAPI.Controllers
 
             if (question == null)
             {
-                return NotFound();
+                throw new NotFoundException($"Question with ID {id} not found");
             }
 
             return question;
@@ -61,7 +62,7 @@ namespace QuizAPI.Controllers
         {
             if (id != question.QnId)
             {
-                return BadRequest();
+                throw new BadRequestException("ID mismatch");
             }
 
             _context.Entry(question).State = EntityState.Modified;
@@ -74,12 +75,9 @@ namespace QuizAPI.Controllers
             {
                 if (!QuestionExists(id))
                 {
-                    return NotFound();
+                    throw new NotFoundException($"Question with ID {id} not found");
                 }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
             return NoContent();
@@ -91,6 +89,11 @@ namespace QuizAPI.Controllers
         [Route("GetAnswers")]
         public async Task<ActionResult<Question>> RetrieveAnswers(int[] qnIds)
         {
+            if (qnIds == null || qnIds.Length == 0)
+            {
+                throw new BadRequestException("No question IDs provided");
+            }
+
             var answers = await (_context.Questions
                 .Where(x => qnIds.Contains(x.QnId))
                 .Select(y => new
@@ -102,6 +105,11 @@ namespace QuizAPI.Controllers
                     Answer = y.Answer
                 })).ToListAsync();
 
+            if (!answers.Any())
+            {
+                throw new NotFoundException("No questions found for the provided IDs");
+            }
+
             return Ok(answers);
         }
 
@@ -112,7 +120,7 @@ namespace QuizAPI.Controllers
             var question = await _context.Questions.FindAsync(id);
             if (question == null)
             {
-                return NotFound();
+                throw new NotFoundException($"Question with ID {id} not found");
             }
 
             _context.Questions.Remove(question);
