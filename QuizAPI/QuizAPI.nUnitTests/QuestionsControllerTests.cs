@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using QuizAPI.Controllers;
 using QuizAPI.Models;
+using QuizAPI.Exceptions;
 
 namespace QuizAPI.Tests
 {
@@ -41,13 +42,16 @@ namespace QuizAPI.Tests
         }
 
         [Test, Order(1)]
-        public async Task GetQuestions()
+        public async Task GetQuestions_ReturnsQuestions()
         {
             var result = await _controller.GetQuestions();
-            Assert.That(result, Is.InstanceOf<ActionResult<IEnumerable<Question>>>());
+            Assert.That(result, Is.InstanceOf<ActionResult<IEnumerable<QuestionDto>>>());
             Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
-        }
 
+            var okResult = result.Result as OkObjectResult;
+            var questions = okResult.Value as IEnumerable<QuestionDto>;
+            Assert.That(questions.Count(), Is.EqualTo(2));
+        }
 
         [Test, Order(2)]
         public async Task GetQuestion_ReturnsCorrectQuestion()
@@ -58,10 +62,10 @@ namespace QuizAPI.Tests
         }
 
         [Test, Order(3)]
-        public async Task GetQuestion_NotFound()
+        public void GetQuestion_NotFound_ThrowsNotFoundException()
         {
-            var result = await _controller.GetQuestion(99);
-            Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
+            var ex = Assert.ThrowsAsync<NotFoundException>(async () => await _controller.GetQuestion(99));
+            Assert.That(ex.Message, Is.EqualTo("Question with ID 99 not found"));
         }
 
         [Test, Order(4)]
@@ -79,17 +83,35 @@ namespace QuizAPI.Tests
         public async Task RetrieveAnswers_ReturnsCorrectAnswers()
         {
             var result = await _controller.RetrieveAnswers(new int[] { 1, 2 });
-            Assert.That(result, Is.InstanceOf<ActionResult<Question>>());
+            Assert.That(result, Is.InstanceOf<ActionResult<IEnumerable<QuestionAnswerDto>>>());
             Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
+
+            var okResult = result.Result as OkObjectResult;
+            var answers = okResult.Value as IEnumerable<QuestionAnswerDto>;
+            Assert.That(answers.Count(), Is.EqualTo(2));
         }
 
         [Test, Order(6)]
+        public void RetrieveAnswers_NoIdsProvided_ThrowsBadRequestException()
+        {
+            var ex = Assert.ThrowsAsync<BadRequestException>(async () => await _controller.RetrieveAnswers(new int[] { }));
+            Assert.That(ex.Message, Is.EqualTo("No question IDs provided"));
+        }
+
+        [Test, Order(7)]
         public async Task DeleteQuestion_RemovesQuestion()
         {
             var result = await _controller.DeleteQuestion(1);
 
             Assert.That(result, Is.InstanceOf<NoContentResult>());
             Assert.That(_context.Questions.Count(), Is.EqualTo(1));
+        }
+
+        [Test, Order(8)]
+        public void DeleteQuestion_NotFound_ThrowsNotFoundException()
+        {
+            var ex = Assert.ThrowsAsync<NotFoundException>(async () => await _controller.DeleteQuestion(99));
+            Assert.That(ex.Message, Is.EqualTo("Question with ID 99 not found"));
         }
     }
 }

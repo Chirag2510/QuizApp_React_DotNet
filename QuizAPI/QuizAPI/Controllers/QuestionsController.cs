@@ -24,10 +24,10 @@ namespace QuizAPI.Controllers
 
         // GET: api/Questions
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Question>>> GetQuestions()
+        public async Task<ActionResult<IEnumerable<QuestionDto>>> GetQuestions()
         {
-            var random5Qns = await (_context.Questions
-                .Select(x => new
+            var random5Qns = await _context.Questions
+                .Select(x => new QuestionDto
                 {
                     QnId = x.QnId,
                     QnInWords = x.QnInWords,
@@ -36,7 +36,7 @@ namespace QuizAPI.Controllers
                 })
                 .OrderBy(y => Guid.NewGuid())
                 .Take(5)
-                ).ToListAsync();
+                .ToListAsync();
 
             return Ok(random5Qns);
         }
@@ -56,7 +56,6 @@ namespace QuizAPI.Controllers
         }
 
         // PUT: api/Questions/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutQuestion(int id, Question question)
         {
@@ -84,26 +83,25 @@ namespace QuizAPI.Controllers
         }
 
         // POST: api/Questions/GetAnswers
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Route("GetAnswers")]
-        public async Task<ActionResult<Question>> RetrieveAnswers(int[] qnIds)
+        public async Task<ActionResult<IEnumerable<QuestionAnswerDto>>> RetrieveAnswers(int[] qnIds)
         {
             if (qnIds == null || qnIds.Length == 0)
             {
                 throw new BadRequestException("No question IDs provided");
             }
 
-            var answers = await (_context.Questions
+            var answers = await _context.Questions
                 .Where(x => qnIds.Contains(x.QnId))
-                .Select(y => new
+                .Select(y => new QuestionAnswerDto
                 {
                     QnId = y.QnId,
                     QnInWords = y.QnInWords,
                     ImageName = y.ImageName,
                     Options = new string[] { y.Option1, y.Option2, y.Option3, y.Option4 },
                     Answer = y.Answer
-                })).ToListAsync();
+                }).ToListAsync();
 
             if (!answers.Any())
             {

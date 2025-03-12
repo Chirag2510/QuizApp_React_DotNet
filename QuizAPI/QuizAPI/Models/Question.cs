@@ -28,4 +28,21 @@ namespace QuizAPI.Models
 
         public int Answer { get; set; }
     }
+
+    public class QuestionAnswerDto
+    {
+        public int QnId { get; set; }
+        public string QnInWords { get; set; }
+        public string? ImageName { get; set; }
+        public string[] Options { get; set; }
+        public int Answer { get; set; }
+    }
+
+    public class QuestionDto
+    {
+        public int QnId { get; set; }
+        public string QnInWords { get; set; }
+        public string? ImageName { get; set; }
+        public string[] Options { get; set; }
+    }
 }

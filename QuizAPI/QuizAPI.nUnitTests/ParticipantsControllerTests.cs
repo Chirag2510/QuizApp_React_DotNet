@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using QuizAPI.Controllers;
 using QuizAPI.Models;
+using QuizAPI.Exceptions;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
@@ -86,10 +87,10 @@ namespace QuizAPI.Tests
         }
 
         [Test, Order(3)]
-        public async Task GetParticipant_NotFound()
+        public void GetParticipant_NotFound_ThrowsNotFoundException()
         {
-            var result = await _controller.GetParticipant(99);
-            Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
+            var ex = Assert.ThrowsAsync<NotFoundException>(async () => await _controller.GetParticipant(99));
+            Assert.That(ex.Message, Is.EqualTo("Participant with ID 99 not found"));
         }
 
         [Test, Order(4)]
@@ -125,7 +126,5 @@ namespace QuizAPI.Tests
             Assert.That(result, Is.InstanceOf<NoContentResult>());
             Assert.That(_context.Participants.Count(), Is.EqualTo(1));
         }
-
-        
     }
 }
