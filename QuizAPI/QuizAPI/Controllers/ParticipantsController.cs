@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using QuizAPI.Models;
+using QuizAPI.Exceptions;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -45,7 +46,7 @@ namespace QuizAPI.Controllers
 
             if (participant == null)
             {
-                return NotFound();
+                throw new NotFoundException($"Participant with ID {id} not found");
             }
 
             participant.Score = EncryptionHelper.DecryptData(participant.Score.ToString());
@@ -60,10 +61,15 @@ namespace QuizAPI.Controllers
         {
             if (id != _participantResult.ParticipantId)
             {
-                return BadRequest();
+                throw new BadRequestException("ID mismatch");
             }
 
-            Participant participant = _context.Participants.Find(id);
+            Participant participant = await _context.Participants.FindAsync(id);
+            if (participant == null)
+            {
+                throw new NotFoundException($"Participant with ID {id} not found");
+            }
+
             participant.Score = EncryptionHelper.EncryptData(_participantResult.Score.ToString());
             participant.TimeTaken = EncryptionHelper.EncryptData(_participantResult.TimeTaken.ToString());
 
@@ -77,12 +83,9 @@ namespace QuizAPI.Controllers
             {
                 if (!ParticipantExists(id))
                 {
-                    return NotFound();
+                    throw new NotFoundException($"Participant with ID {id} not found");
                 }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
             return NoContent();
@@ -98,7 +101,7 @@ namespace QuizAPI.Controllers
 
             if (participant == null)
             {
-                return Unauthorized(new { message = "Invalid email or password." });
+                throw new UnauthorizedException("Invalid email or password");
             }
 
             // Verify the password
@@ -109,14 +112,11 @@ namespace QuizAPI.Controllers
 
                 if (participant.Password != hashedPassword)
                 {
-                    return Unauthorized(new { message = "Invalid email or password." });
+                    throw new UnauthorizedException("Invalid email or password");
                 }
             }
 
-            // Generate JWT token
             var tokenString = GenerateJwtToken(participant);
-
-            // Store token in session storage
             HttpContext.Session.SetString("authToken", tokenString);
 
             return Ok(new { participantId = participant.ParticipantId, token = tokenString });
@@ -126,16 +126,15 @@ namespace QuizAPI.Controllers
         [HttpPost("signup")]
         public async Task<ActionResult> PostParticipant(Participant participant)
         {
-            var existingParticipant = _context.Participants
+            var existingParticipant = await _context.Participants
                 .Where(x => x.Email == participant.Email)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
 
             if (existingParticipant != null)
             {
-                return Conflict(new { message = "Email is already registered." });
+                throw new ConflictException("Email is already registered");
             }
 
-            // Encrypt the password before storing it
             using (var sha256 = SHA256.Create())
             {
                 var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(participant.Password));
@@ -145,10 +144,7 @@ namespace QuizAPI.Controllers
             _context.Participants.Add(participant);
             await _context.SaveChangesAsync();
 
-            // Generate JWT token
             var tokenString = GenerateJwtToken(participant);
-
-            // Store token in session storage
             HttpContext.Session.SetString("authToken", tokenString);
 
             return Ok(new { participantId = participant.ParticipantId, token = tokenString });
@@ -170,7 +166,7 @@ namespace QuizAPI.Controllers
             var participant = await _context.Participants.FindAsync(id);
             if (participant == null)
             {
-                return NotFound();
+                throw new NotFoundException($"Participant with ID {id} not found");
             }
 
             _context.Participants.Remove(participant);
